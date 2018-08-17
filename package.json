@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": ". ./setup.sh && node server.js",
-    "start:prod": ". ./setup.sh prod && node server.js"
+    "start": ". ./bin/setup.sh && node server.js",
+    "start:prod": ". ./bin/setup.sh prod && node server.js"
   },
   "author": "",
   "license": "ISC",

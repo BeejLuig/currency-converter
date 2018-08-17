@@ -1,6 +1,6 @@
 const express = require('express');
 const currencyCodes = require('./currency-codes.json');
-const config = require('./config');
+const config = require('../config');
 
 const app = express();
 let cache = {};
