@@ -1,0 +1,30 @@
+{
+  "name": "Currency Converter",
+  "description": "Converts currencies on a web page with a simple click.",
+  "icons": {
+    "128": "TODO"
+  },
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "permissions": ["activeTab", "contextMenus", "storage", "tabs"],
+  "background": {
+    "scripts": ["TODO-background.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_title": "Converts currencies on a web page with a simple click.",
+    "default_popup": "TODO-popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["TODO-contentscript.js"],
+      "all_frames": true
+    }
+  ],
+  "options_ui": {
+    "page": "TODO-options.html",
+    "chrome_style": true
+  },
+  "commands": {}
+}
