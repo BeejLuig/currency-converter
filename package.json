@@ -13,6 +13,11 @@
       "pre-commit": "precise-commits"
     }
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "precise-commits"
+    }
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
