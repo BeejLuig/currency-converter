@@ -17,47 +17,54 @@ const setResponse = config => {
     const mockBody = require('../config/mock-response.json');
     return mockBody;
   }
-}
+};
 
-
-const calculateConversion = (base, currency) =>
-  (1 / base) * (currency);
+const calculateConversion = (base, currency) => (1 / base) * currency;
 
 const normalizeConversions = rates =>
-  Object.keys(rates)
-    .reduce((obj, base) => ({
+  Object.keys(rates).reduce(
+    (obj, base) => ({
       ...obj,
       [base]: {
         currency: base,
-        convertTo: (
-          Object.keys(rates)
-            .reduce((rate, currency) => ({
-              ...rate,
-              [currency]: calculateConversion(rates[base], rates[currency])
-            }), {})
-        )
-      }
-    }), {})
+        convertTo: Object.keys(rates).reduce(
+          (rate, currency) => ({
+            ...rate,
+            [currency]: calculateConversion(rates[base], rates[currency]),
+          }),
+          {}
+        ),
+      },
+    }),
+    {}
+  );
 
 const mapToCurrencyCodes = conversions =>
-  Object.keys(conversions)
-    .reduce((obj, currency) => ({
+  Object.keys(conversions).reduce(
+    (obj, currency) => ({
       ...obj,
       [currency]: {
         ...conversions[currency],
-        ...currencyCodes[currency]
-      }
-    }), {});
+        ...currencyCodes[currency],
+      },
+    }),
+    {}
+  );
 
 const mapToCurrencyNames = conversions =>
-    Object.keys(currencyCodes)
-      .reduce((obj, currency) => ({
-        ...obj,
-        [currencyCodes[currency].name.split(' ').join('-').toLowerCase()]: {
-          ...conversions[currency],
-          ...currencyCodes[currency]
-        }
-      }), {});
+  Object.keys(currencyCodes).reduce(
+    (obj, currency) => ({
+      ...obj,
+      [currencyCodes[currency].name
+        .split(' ')
+        .join('-')
+        .toLowerCase()]: {
+        ...conversions[currency],
+        ...currencyCodes[currency],
+      },
+    }),
+    {}
+  );
 
 app.all((req, res, next) => {
   console.log(req.method, req.path);
