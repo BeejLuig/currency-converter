@@ -8,6 +8,11 @@
     "start": ". ./bin/setup.sh && node src/middleware/server.js",
     "start:prod": ". ./bin/setup.sh prod && node src/middleware/server.js"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "precise-commits"
+    }
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -15,6 +20,9 @@
     "express": "^4.16.3"
   },
   "devDependencies": {
-    "node-mocks-http": "^1.7.0"
+    "husky": "0.14.3",
+    "node-mocks-http": "^1.7.0",
+    "precise-commits": "1.0.2",
+    "prettier": "1.14.2"
   }
 }
