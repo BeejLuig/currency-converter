@@ -14,7 +14,7 @@ const setResponse = config => {
     const { baseUrl } = config.fixer;
     return axios.get(`${baseUrl}?access_key=${fixerKey}`);
   } else {
-    const mockBody = require('./mock/mock-response.json');
+    const mockBody = require('../config/mock-response.json');
     return mockBody;
   }
 }
@@ -107,8 +107,27 @@ app.get('/api/currencies/name/:name', async (req, res) => {
   }
 });
 
-app.get('/api/currencies/convert/:from-:to', () => {
-  // TODO
+app.get('/api/currencies/convert/:from-:to', async (req, res) => {
+  const { from, to } = req.params;
+  const { amount=1 } = req.query;
+  if (!cache.currenciesByCode) {
+    let response = await setResponse(config);
+    let conversions = normalizeConversions(response.rates);
+    let currenciesByCode = mapToCurrencyCodes(conversions);
+    cache = { ...cache, currenciesByCode };
+  }
+
+  const result = cache.currenciesByCode[from].convertTo[to] * amount;
+  res.send({
+    from: {
+      currency: from,
+      amount: Number(amount)
+    },
+    to: {
+      currency: to,
+      amount: result
+    }
+  });
 });
 
 app.listen(3000, () => console.log('Listening on port 3000'));
