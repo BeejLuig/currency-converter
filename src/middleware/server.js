@@ -116,7 +116,7 @@ app.get('/api/currencies/name/:name', async (req, res) => {
 
 app.get('/api/currencies/convert/:from-:to', async (req, res) => {
   const { from, to } = req.params;
-  const { amount=1 } = req.query;
+  const { amount = 1 } = req.query;
   if (!cache.currenciesByCode) {
     let response = await setResponse(config);
     let conversions = normalizeConversions(response.rates);
@@ -128,12 +128,12 @@ app.get('/api/currencies/convert/:from-:to', async (req, res) => {
   res.send({
     from: {
       currency: from,
-      amount: Number(amount)
+      amount: Number(amount),
     },
     to: {
       currency: to,
-      amount: result
-    }
+      amount: result,
+    },
   });
 });
 
