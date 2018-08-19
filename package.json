@@ -4,15 +4,11 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "lint": "eslint src --fix",
+    "lint": "eslint src --fix --cache",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": ". ./bin/setup.sh && node src/middleware/server.js",
-    "start:prod": ". ./bin/setup.sh prod && node src/middleware/server.js"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "precise-commits"
-    }
+    "start:prod": ". ./bin/setup.sh prod && node src/middleware/server.js",
+    "precommit": "npm run lint && precise-commits"
   },
   "author": "",
   "license": "ISC",
