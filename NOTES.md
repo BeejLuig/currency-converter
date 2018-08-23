@@ -6,6 +6,7 @@
 - API:
   - '/api/currencies/:currencyCode' -- returns currency object with all conversions, adds result to cache
   - additionally, every return should include a marker indicating how long it will be valid for
+  - possibly sends via a JWT? (would require JWT library on both MW and FE)
 
 ## Extension
 
@@ -15,6 +16,7 @@
 
 - Responsible for parsing the currencies on the page and reporting to the background script
 - Updates the currency text on the page and/or adds a tooltip for each displayed currency
+- Could report classes/IDs of elements that contained a currency conversion (or path to DOM nodes) to be cached in storage so the DOM doesn't have to be searched each time for similar pages within the same (sub)domain/page
 
 ### Options
 
