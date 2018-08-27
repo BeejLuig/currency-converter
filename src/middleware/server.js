@@ -9,13 +9,13 @@ const setResponse = config => {
   const { mockApi } = config;
 
   if (mockApi) {
+    const mockBody = require('../config/mock-response.json');
+    return mockBody;
+  } else {
     const axios = require('axios');
     const fixerKey = process.env.FIXER_KEY;
     const { baseUrl } = config.fixer;
     return axios.get(`${baseUrl}?access_key=${fixerKey}`);
-  } else {
-    const mockBody = require('../config/mock-response.json');
-    return mockBody;
   }
 };
 
