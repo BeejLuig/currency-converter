@@ -1,11 +1,12 @@
 const express = require('express');
 const currencyCodes = require('./currency-codes.json');
 const config = require('../config');
+const { ONE_HOUR } = require('../utils/constants');
 
 const app = express();
 let cache = {};
 
-const setResponse = config => {
+const getFetchBaseConversions = async config => {
   const { mockApi } = config;
 
   if (mockApi) {
@@ -18,123 +19,62 @@ const setResponse = config => {
     return axios.get(`${baseUrl}?access_key=${fixerKey}`);
   }
 };
+const fetchBaseConversions = async () => {
+  const baseConversions = await getFetchBaseConversions(config);
+  const normalizedConversions = normalizeConversions(baseConversions);
+  const baseCurrency = mapToCurrencyCodes(normalizedConversions);
+  cache = {
+    [baseCurrency.currency]: baseCurrency,
+  };
+};
 
-const calculateConversion = (base, currency) => (1 / base) * currency;
+const invertConversionRate = rate => 1 / rate;
 
-const normalizeConversions = rates =>
-  Object.keys(rates).reduce(
-    (obj, base) => ({
-      ...obj,
-      [base]: {
-        currency: base,
-        convertTo: Object.keys(rates).reduce(
-          (rate, currency) => ({
-            ...rate,
-            [currency]: calculateConversion(rates[base], rates[currency]),
-          }),
-          {}
-        ),
-      },
-    }),
-    {}
-  );
+const normalizeConversions = currency => ({
+  currency: currency.base,
+  convertTo: currency.rates,
+});
 
-const mapToCurrencyCodes = conversions =>
-  Object.keys(conversions).reduce(
-    (obj, currency) => ({
-      ...obj,
-      [currency]: {
-        ...conversions[currency],
-        ...currencyCodes[currency],
-      },
-    }),
-    {}
-  );
+const mapToCurrencyCodes = currency => ({
+  ...currency,
+  ...currencyCodes[currency.currency],
+});
 
-const mapToCurrencyNames = conversions =>
-  Object.keys(currencyCodes).reduce(
-    (obj, currency) => ({
-      ...obj,
-      [currencyCodes[currency].name
-        .split(' ')
-        .join('-')
-        .toLowerCase()]: {
-        ...conversions[currency],
-        ...currencyCodes[currency],
-      },
-    }),
-    {}
-  );
+const init = () => {
+  fetchBaseConversions();
+  setInterval(fetchBaseConversions, ONE_HOUR);
+};
 
-app.all((req, res, next) => {
+app.all('*', (req, res, next) => {
   console.log(req.method, req.path);
   next();
 });
 
-app.get('/api/currencies', async (req, res) => {
-  if (!cache.currenciesByCode) {
-    let response = await setResponse(config);
-    let conversions = normalizeConversions(response.rates);
-    let currenciesByCode = mapToCurrencyCodes(conversions);
-    cache = { ...cache, currenciesByCode };
-  }
-  res.send(cache.currenciesByCode);
-});
-
 app.get('/api/currencies/code/:currencyCode', async (req, res) => {
   const { currencyCode } = req.params;
+  const currency = currencyCode.toUpperCase();
 
-  if (!cache.currenciesByCode) {
-    let response = await setResponse(config);
-    let conversions = normalizeConversions(response.rates);
-    let currenciesByCode = mapToCurrencyCodes(conversions);
-    cache = { ...cache, currenciesByCode };
+  if (currency in cache) return res.send(cache[currency]);
+  if (currency in cache.EUR.convertTo) {
+    const convertedCurrency = {
+      currency,
+      convertTo: Object.keys(cache.EUR.convertTo).reduce(
+        (obj, code) => ({
+          ...obj,
+          [code]: invertConversionRate(cache.EUR.convertTo[code]),
+        }),
+        {}
+      ),
+    };
+    const mappedCurrency = mapToCurrencyCodes(convertedCurrency);
+    cache[currency] = mappedCurrency;
+    return res.send(mappedCurrency);
   }
-
-  if (currencyCode in cache.currenciesByCode) {
-    res.send(cache.currenciesByCode[currencyCode]);
-  } else {
-    res.status(400).send('No currency found');
-  }
+  res.status(400).send('Not found');
 });
 
-app.get('/api/currencies/name/:name', async (req, res) => {
-  const { name } = req.params;
-
-  if (!cache.currenciesByName) {
-    let response = await setResponse(config);
-    let conversions = normalizeConversions(response.rates);
-    let currenciesByName = mapToCurrencyNames(conversions);
-    cache = { ...cache, currenciesByName };
-  }
-  if (name in cache.currenciesByName) {
-    res.send(cache.currenciesByName[name]);
-  } else {
-    res.status(400).send('No currency found');
-  }
+app.listen(3000, () => {
+  console.log('Listening on port 3000');
 });
 
-app.get('/api/currencies/convert/:from-:to', async (req, res) => {
-  const { from, to } = req.params;
-  const { amount = 1 } = req.query;
-  if (!cache.currenciesByCode) {
-    let response = await setResponse(config);
-    let conversions = normalizeConversions(response.rates);
-    let currenciesByCode = mapToCurrencyCodes(conversions);
-    cache = { ...cache, currenciesByCode };
-  }
-
-  const result = cache.currenciesByCode[from].convertTo[to] * amount;
-  res.send({
-    from: {
-      currency: from,
-      amount: Number(amount),
-    },
-    to: {
-      currency: to,
-      amount: result,
-    },
-  });
-});
-
-app.listen(3000, () => console.log('Listening on port 3000'));
+init();
