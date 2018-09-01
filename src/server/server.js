@@ -20,24 +20,26 @@ const getFetchBaseConversions = async config => {
   }
 };
 const fetchBaseConversions = async () => {
+  const expiration = Date.now() + ONE_HOUR;
   const baseConversions = await getFetchBaseConversions(config);
   const normalizedConversions = normalizeConversions(baseConversions);
   const baseCurrency = mapToCurrencyCodes(normalizedConversions);
   cache = {
-    [baseCurrency.currency]: baseCurrency,
+    expiration,
+    [baseCurrency.code]: baseCurrency,
   };
 };
 
 const invertConversionRate = rate => 1 / rate;
 
 const normalizeConversions = currency => ({
-  currency: currency.base,
+  code: currency.base,
   convertTo: currency.rates,
 });
 
 const mapToCurrencyCodes = currency => ({
   ...currency,
-  ...currencyCodes[currency.currency],
+  ...currencyCodes[currency.code],
 });
 
 const init = () => {
@@ -52,12 +54,18 @@ app.all('*', (req, res, next) => {
 
 app.get('/api/currencies/code/:currencyCode', async (req, res) => {
   const { currencyCode } = req.params;
-  const currency = currencyCode.toUpperCase();
+  const code = currencyCode.toUpperCase();
 
-  if (currency in cache) return res.send(cache[currency]);
-  if (currency in cache.EUR.convertTo) {
+  if (code in cache) {
+    return res.send({
+      expiration: cache.expiration,
+      currency: cache[code],
+    });
+  }
+
+  if (code in cache.EUR.convertTo) {
     const convertedCurrency = {
-      currency,
+      code,
       convertTo: Object.keys(cache.EUR.convertTo).reduce(
         (obj, code) => ({
           ...obj,
@@ -67,9 +75,13 @@ app.get('/api/currencies/code/:currencyCode', async (req, res) => {
       ),
     };
     const mappedCurrency = mapToCurrencyCodes(convertedCurrency);
-    cache[currency] = mappedCurrency;
-    return res.send(mappedCurrency);
+    cache[code] = mappedCurrency;
+    return res.send({
+      expiration: cache.expiration,
+      currency: cache[code],
+    });
   }
+
   res.status(400).send('Not found');
 });
 
