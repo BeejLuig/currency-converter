@@ -1,6 +1,6 @@
 const express = require('express');
 const currencyCodes = require('./currency-codes.json');
-const config = require('../config');
+const config = require('./config');
 const { ONE_HOUR } = require('../utils/constants');
 
 const app = express();
@@ -10,7 +10,7 @@ const getFetchBaseConversions = async config => {
   const { mockApi } = config;
 
   if (mockApi) {
-    const mockBody = require('../config/mock-response.json');
+    const mockBody = require('./config/mock-response.json');
     return mockBody;
   } else {
     const axios = require('axios');
