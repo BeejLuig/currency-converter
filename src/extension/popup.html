@@ -1,0 +1,42 @@
+<html>
+
+<head>
+    <style>
+        :root {
+            font-size: 16px;
+        }
+
+        body {
+            min-width: 400px;
+        }
+
+        h1 {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Currency Converter</h1>
+    <label>
+        <input id="fromAmount" name="amount" type="number" value="0.0">
+        <select id="fromCode" name="from" id="fromCode">
+            <option value="USD">United States dollar</option>
+            <option value="CAD">Canadian dollar</option>
+            <option value="EUR">Euro</option>
+        </select>
+    </label>
+    <br />
+    <label>
+        <input name="toAmount" type="number" id="toAmount" value="0.0">
+        <select name="toCode" id="toCode">
+            <option value="EUR">Euro</option>
+            <option value="USD">United States dollar</option>
+            <option value="CAD">Canadian dollar</option>
+        </select>
+    </label>
+    <pre id="data"></pre>
+    <script src="popup.js"></script>
+</body>
+
+</html>
