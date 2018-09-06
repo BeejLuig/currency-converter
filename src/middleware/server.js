@@ -30,7 +30,8 @@ const fetchBaseConversions = async () => {
   };
 };
 
-const invertConversionRate = rate => 1 / rate;
+const invertConversionRate = (base, newBase, conversion) =>
+  cache[base].convertTo[conversion] / cache[base].convertTo[newBase];
 
 const normalizeConversions = currency => ({
   code: currency.base,
@@ -52,7 +53,7 @@ app.all('*', (req, res, next) => {
   next();
 });
 
-app.get('/api/currencies/code/:currencyCode', async (req, res) => {
+app.get('/api/v1/currencies/code/:currencyCode', async (req, res) => {
   const { currencyCode } = req.params;
   const code = currencyCode.toUpperCase();
 
@@ -67,9 +68,9 @@ app.get('/api/currencies/code/:currencyCode', async (req, res) => {
     const convertedCurrency = {
       code,
       convertTo: Object.keys(cache.EUR.convertTo).reduce(
-        (obj, code) => ({
+        (obj, conversion) => ({
           ...obj,
-          [code]: invertConversionRate(cache.EUR.convertTo[code]),
+          [conversion]: invertConversionRate('EUR', code, conversion),
         }),
         {}
       ),
