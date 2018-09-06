@@ -6,8 +6,8 @@
   "scripts": {
     "lint": "eslint src --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": ". ./bin/setup.sh && node src/middleware/server.js",
-    "start:prod": ". ./bin/setup.sh prod && node src/middleware/server.js",
+    "start": ". ./bin/setup.sh && node src/server/server.js",
+    "start:prod": ". ./bin/setup.sh prod && node src/server/server.js",
     "precommit": "npm run lint && precise-commits"
   },
   "author": "",
