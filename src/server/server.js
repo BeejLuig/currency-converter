@@ -1,6 +1,6 @@
 const express = require('express');
 const currencyCodes = require('./currency-codes.json');
-const config = require('./config');
+const config = require('../config');
 const { ONE_HOUR } = require('../utils/constants');
 
 const app = express();
@@ -10,7 +10,7 @@ const getFetchBaseConversions = async config => {
   const { mockApi } = config;
 
   if (mockApi) {
-    const mockBody = require('./config/mock-response.json');
+    const mockBody = require('../config/mock-response.json');
     return mockBody;
   } else {
     const axios = require('axios');
@@ -30,7 +30,8 @@ const fetchBaseConversions = async () => {
   };
 };
 
-const invertConversionRate = rate => 1 / rate;
+const invertConversionRate = (base, newBase, conversion) =>
+  cache[base].convertTo[conversion] / cache[base].convertTo[newBase];
 
 const normalizeConversions = currency => ({
   code: currency.base,
@@ -52,7 +53,7 @@ app.all('*', (req, res, next) => {
   next();
 });
 
-app.get('/api/currencies/code/:currencyCode', async (req, res) => {
+app.get('/api/v1/currencies/code/:currencyCode', async (req, res) => {
   const { currencyCode } = req.params;
   const code = currencyCode.toUpperCase();
 
@@ -67,9 +68,9 @@ app.get('/api/currencies/code/:currencyCode', async (req, res) => {
     const convertedCurrency = {
       code,
       convertTo: Object.keys(cache.EUR.convertTo).reduce(
-        (obj, code) => ({
+        (obj, conversion) => ({
           ...obj,
-          [code]: invertConversionRate(cache.EUR.convertTo[code]),
+          [conversion]: invertConversionRate('EUR', code, conversion),
         }),
         {}
       ),
