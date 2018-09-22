@@ -1,0 +1,126 @@
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
+    <style>
+        :root {
+            font-size: 16px;
+        }
+
+        * {
+            font-family: 'Rubik', sans-serif;
+        }
+
+        body {
+            box-sizing: border-box;
+            min-width: 333px;
+        }
+
+        h1 {
+            font-size: 1rem;
+            color: darkslategray;
+        }
+
+        input, .select {
+            width: 50%;
+        }
+
+        input {
+            border-radius: 6px;
+            border: 1px solid #DFE1E5;
+            color: #70757A;
+            font-size: 1rem;
+            padding: 0 0 0 12px;
+            margin: 0 4px 0 0;
+            overflow: hidden;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .select {
+            border-radius: 6px;
+            border: 1px solid #DFE1E5;
+            overflow: hidden;
+            position: relative;
+        }
+
+        select {
+            -webkit-appearance: button;
+            border: none;
+            color: #70757A;
+            font-size: 0.8rem;
+            overflow: hidden;
+            background-color: #fff;
+            height: 36px;
+            padding-left: 8px;
+            width: 100%;
+        }
+
+        svg {
+            display: block;
+            height: 100%;
+            width: 100%;
+        }
+
+        .svg {
+            color: #70757A;
+            position: absolute;
+            right: 1px;
+            top: 5px;
+            pointer-events: none;
+            fill: currentColor;
+            height: 24px;
+            line-height: 24px;
+            width: 24px;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .container:first-of-type {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Currency Converter</h1>
+    <section class="container">
+        <input id="fromAmount" name="amount" type="number" value="0">
+        <div class="select">
+            <select id="fromCode" name="fromCode">
+                <option value="USD">United States dollar</option>
+                <option value="CAD">Canadian dollar</option>
+                <option value="EUR">Euro</option>
+            </select>
+            <span class="svg">
+                <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z"></path>
+                </svg>
+            </span>
+        </div>
+    </section>
+    <section class="container">
+        <input name="toAmount" type="number" id="toAmount" value="0">
+        <div class="select">
+            <select name="toCode" id="toCode">
+                <option value="EUR">Euro</option>
+                <option value="USD">United States dollar</option>
+                <option value="CAD">Canadian dollar</option>
+            </select>
+            <span class="svg">
+                <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z"></path>
+                </svg>
+            </span>
+        </div>
+    </section>
+    <script src="popup.js"></script>
+</body>
+
+</html>
